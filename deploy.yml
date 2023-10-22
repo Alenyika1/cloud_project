@@ -1,0 +1,31 @@
+---
+- hosts: slave
+  become: yes
+  tasks:
+    - name: Execute the bash script
+      script: /home/vagrant/deploy_new.sh
+
+    - name: Verify PHP installation
+      command: php -v
+      register: php_version
+
+    - name: Debug PHP Version
+      debug:
+        var: php_version.stdout
+
+    - name: Verify PHP Application Accessibility
+      command: curl -I http://192.168.58.4
+      register: php_app_access
+      ignore_errors: yes
+
+    - name: Debug PHP Application Access Result
+      debug:
+        var: php_app_access.stdout_lines
+
+    - name: Set Up a Cron Job to Check Server Uptime
+      cron:
+        name: Check Server Uptime
+        minute: 0
+        hour: 0
+        job: "uptime > /var/log/uptime.log"
+
