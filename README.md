@@ -17,13 +17,6 @@ This guide provides step-by-step instructions on how to automate the deployment 
 
 
 ```bash
-# Update System
-echo "Updating System..."
-sudo apt-get update -y
-```
-This part updates the package lists for upgrades and new package installations.
-
-```bash
 # Install Apache2
 echo "Installing Apache2..."
 sudo apt-get install -y apache2
@@ -76,22 +69,29 @@ php artisan key:generate
 # Set necessary permissions
 sudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
+```
+The script navigates into the project directory, installs project dependencies through Composer, sets up the environment file for Laravel, and sets necessary permissions
 
+```bash
 # Configure Apache to run the Laravel application
 sudo sh -c 'echo "<VirtualHost *:80>
     DocumentRoot /var/www/html/laravel/public
     <Directory /var/www/html/laravel/>
         AllowOverride All
     </Directory>
-</VirtualHost>" > /etc/apache2/sites-available/000-default.conf'
+</VirtualHost>" > /etc/apache2/sites-available/laravel.conf'
 
 # Enable Apache mod_rewrite
 sudo a2enmod rewrite
 
 # Restart Apache
-sudo service apache2 restart
+sudo systemctl restart apache2
+```
+The above part of the deploy.sh script is to configures Apache to serve the Laravel application, enables mod_rewrite for URL rewriting support, and restarts Apache to apply changes
 
-# Create MySQL Database and User for the Laravel application (Replace 'database_name', 'user' and 'password' with your actual database name, username and password)
+```bash
+
+# Create MySQL Database and User for the Laravel app lication (Replace 'database_name', 'user' and 'password' with your actual database name, username and password)
 mysql -uroot -proot <<MYSQL_SCRIPT
 CREATE DATABASE laravel;
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'alenyika';
@@ -101,14 +101,14 @@ MYSQL_SCRIPT
 
 echo "LAMP Stack Installed and Configured!"
 ```
-The rest of the script navigates into the project directory, installs project dependencies through Composer, sets up the environment file for Laravel, sets necessary permissions, configures Apache to serve the Laravel application, enables mod_rewrite for URL rewriting support, restarts Apache to apply changes, creates a MySQL database and user for the Laravel application, and finally prints a success message.
+The rest of the script creates a MySQL database and user for the Laravel application, and finally prints a success message.
 
 3. **Execute the Ansible Playbook**
 
-   To execute the Ansible playbook, navigate to the directory containing your playbook file in your terminal and run:
+   To execute the Ansible playbook, make sure that the ssh connectiion between the nodes are enabled. To do this, copy your ssh key from your master node to the slave node autorized_keys file. Navigate to the directory containing your playbook file in your terminal and run:
 
    ```bash
-   ansible-playbook playbook.yml
+   ansible-playbook deploy.yml
    ```
 
 That's it! Your Laravel application should now be deployed on your Slave server with a LAMP stack.
