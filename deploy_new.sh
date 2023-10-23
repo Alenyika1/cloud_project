@@ -63,9 +63,9 @@ FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
 # Update .env file with database configuration
-sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
-sed -i "s/DB_USERNAME=.*/DB_USERNAME=admin/" .env
-sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=alenyika/" .env
+sudo sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
+sudo sed -i "s/DB_USERNAME=.*/DB_USERNAME=admin/" .env
+sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=alenyika/" .env
 
 # Start local server deployement
 php artisan migrate # this start the database migration as configured in the .env file and mysql settings
