@@ -21,10 +21,6 @@ echo "Installing Composer..."
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
 
-# Install Git
-echo "Installing Git..."
-sudo apt-get install git -y
-
 # Clone Laravel application from GitHub
 echo "Cloning Laravel application from Git..."
 sudo git clone https://github.com/laravel/laravel.git /var/www/html/
@@ -37,7 +33,7 @@ echo "Installing project dependencies..."
 composer install
 
 # Configure environment file for Laravel
-cp .env.example .env
+sudo cp .env.example .env
 php artisan key:generate
 
 # Set necessary permissions
@@ -70,5 +66,10 @@ MYSQL_SCRIPT
 sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
 sed -i "s/DB_USERNAME=.*/DB_USERNAME=admin/" .env
 sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=alenyika/" .env
+
+# Start local server deployement
+php artisan migrate # this start the database migration as configured in the .env file and mysql settings
+php artisan serve
+
 
 echo "LAMP Stack Installed and Configured!"

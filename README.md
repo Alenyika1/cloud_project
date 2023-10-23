@@ -98,10 +98,23 @@ CREATE USER 'admin'@'localhost' IDENTIFIED BY 'alenyika';
 GRANT ALL PRIVILEGES ON laravel.* TO 'admin'@'localhost';
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
+```
+This part of the script creates a MySQL database and user for the Laravel application
+```bash
+# Update .env file with database configuration
+sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
+sed -i "s/DB_USERNAME=.*/DB_USERNAME=admin/" .env
+sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=alenyika/" .env
+```
+This part of the script will update the .env file with the configured mysql database
+```bash
+# Start local server deployement
+php artisan migrate # this start the database migration as configured in the .env file and mysql settings
+php artisan serve
 
 echo "LAMP Stack Installed and Configured!"
 ```
-The rest of the script creates a MySQL database and user for the Laravel application, and finally prints a success message.
+The last step is to migrate the database configured in the .env file and start a local development server. 
 
 3. **Execute the Ansible Playbook**
 
