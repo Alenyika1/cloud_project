@@ -1,5 +1,5 @@
 ---
-- hosts: slave
+- hosts: webservers
   become: yes
   tasks:
     - name: Copy the LAMP setup script to the remote server

@@ -12,7 +12,7 @@ This guide provides step-by-step instructions on how to automate the deployment 
 
 ## Steps
 1. **Create a vahrant configuration file to provision the Master and Slave node and the appropiate configuration needed for the cluster**
-
+TO do that create a project directory and ```vagrant init``` and edit the configuration file with the following
  ```bash
  Vagrant.configure("2") do |config|
   # Configure the "Master" VM
@@ -40,45 +40,35 @@ end
 
     Create a bash script named `deploy.sh` in the home directory of your Master server. This script will install and configure the LAMP (Linux, Apache, MySQL, PHP) stack, clone your Laravel application from GitHub, and set up a MySQL database for the application.
 
-
+The first step is to install all the neccessary lamp stack and it dependencies needed to deploy your application
 ```bash
 # Install Apache2
 echo "Installing Apache2..."
 sudo apt-get install -y apache2
-```
-This part installs Apache2, a popular open-source web server.
-
-```bash
 # Install MySQL Server
 echo "Installing MySQL Server..."
 sudo apt-get install -y mysql-server
-```
-This part installs MySQL server, a widely used database management system.
-
-```bash
 # Install PHP 8.2 and necessary PHP extensions
 echo "Installing PHP 8.2 and necessary PHP extensions..."
 sudo add-apt-repository ppa:ondrej/php
 sudo apt-get update -y
-sudo apt-get install -y php8.2 php8.2-common php8.2-cli php8.2-gd php8.2-curl php8.2-mysql
+sudo apt-get install -y php8.2 php8.2-common php8.2-cli php8.2-gd php8.2-curl php8.2-mysql php8.2-zip php-xml
 ```
-This part adds a Personal Package Archive (PPA) repository that contains PHP 8.2, updates the package lists again, and then installs PHP 8.2 along with some common extensions.
 
+- The next is to download and install Composer, a tool for dependency management in PHP.
 ```bash
 # Install Composer
 echo "Installing Composer..."
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
 ```
-This part downloads and installs Composer, a tool for dependency management in PHP.
-
+- clone Laravel application from GitHub into the `/var/www/html/laravel` directory.
 ```bash
 # Clone Laravel application from GitHub
 echo "Cloning Laravel application from Git..."
 git clone https://github.com/laravel/laravel.git /var/www/html/laravel
 ```
-This part clones a Laravel application from GitHub into the `/var/www/html/laravel` directory.
-
+- Navigates into the project directory, installs project dependencies through Composer, sets up the environment file for Laravel, and sets necessary permissions
 ```bash
 # Navigate to the project directory
 cd /var/www/html/laravel
@@ -92,27 +82,28 @@ cp .env.example .env
 php artisan key:generate
 
 # Set necessary permissions
-oobcsudo chgrp -R www-data storage bootstrap/cache
+sudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
 ```
-The script navigates into the project directory, installs project dependencies through Composer, sets up the environment file for Laravel, and sets necessary permissions
-
+- Configure a .conf file for the laravel application in the /etc/apache2/sites-available directory
 ```bash
 # Configure Apache to run the Laravel application
-sudo sh -c 'echo "<VirtualHost *:80>
+echo "<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html/laravel/public
+
     <Directory /var/www/html/laravel/>
-        AllowOverride All
+      Options +FollowSymlinks
+      AllowOverride All
+      Require all granted
     </Directory>
-</VirtualHost>" > /etc/apache2/sites-available/laravel.conf'
 
-# Enable Apache mod_rewrite
-sudo a2enmod rewrite
-
-# Restart Apache
-sudo systemctl restart apache2
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>" | sudo tee /etc/apache2/sites-available/laravel.conf
 ```
-The above part of the deploy.sh script is to configures Apache to serve the Laravel application, enables mod_rewrite for URL rewriting support, and restarts Apache to apply changes
+
+- Creates a MySQL database and user for the Laravel application
 
 ```bash
 # Create MySQL Database and User for the Laravel app lication (Replace 'database_name', 'user' and 'password' with your actual database name, username and password)
@@ -123,14 +114,29 @@ GRANT ALL PRIVILEGES ON laravel.* TO 'admin'@'localhost';
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 ```
-This part of the script creates a MySQL database and user for the Laravel application
+- Update the .env file with the the database configuration
 ```bash
 # Update .env file with database configuration
 sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
 sed -i "s/DB_USERNAME=.*/DB_USERNAME=admin/" .env
 sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=alenyika/" .env
 ```
-This part of the script will update the .env file with the configured mysql database
+- Configure the Apache2 service to deploy the laravel by disabling the default configuration and enabling the new laravel configuration. Rewrite after and restart the apache2 service.
+
+```bash
+# Disable the default configuration file
+sudo a2dissite 000-default.conf
+
+# enable the laravel configuration in Apache
+sudo a2ensite laravel.conf
+
+# Enable Apache mod_rewrite
+sudo a2enmod rewrite
+
+# Restart Apache
+sudo systemctl restart apache2
+```
+- Start Laravel server deployement
 ```bash
 # Start local server deployement
 php artisan migrate # this start the database migration as configured in the .env file and mysql settings
@@ -138,15 +144,14 @@ php artisan serve
 
 echo "LAMP Stack Installed and Configured!"
 ```
-The last step is to migrate the database configured in the .env file and start a local development server. 
 
 4. **Execute the Ansible Playbook**
     Create 
-
-   To execute the Ansible playbook, make sure that the ssh connectiion between the nodes are enabled. To do this, copy your ssh key from your master node to the slave node autorized_keys file. Navigate to the directory containing your playbook file in your terminal and run:
+   To execute the Ansible playbook, make sure that the ssh connectiion between the nodes are enabled. To do this, copy your ssh key from your master node to the slave node autorized_keys file. 
+   Navigate to the directory containing your playbook file in your terminal and run:
 
    ```bash
-   ansible-playbook deploy.yml
+   ansible-playbook -i inventory deploy.yml
    ```
 
 That's it! Your Laravel application should now be deployed on your Slave server with a LAMP stack.
