@@ -26,14 +26,17 @@ echo "Cloning Laravel application from Git..."
 sudo git clone https://github.com/laravel/laravel.git /var/www/html/
 
 # Navigate to the project directory
+sudo chown -R vagrant:vagrant /var/www/html/laravel/
 cd /var/www/html/laravel
+
+
+# Configure environment file for Laravel
+sudo cp .env.example .env
 
 # Install dependencies through Composer
 echo "Installing project dependencies..."
 composer install
 
-# Configure environment file for Laravel
-sudo cp .env.example .env
 php artisan key:generate
 
 # Set necessary permissions

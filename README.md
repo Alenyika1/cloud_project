@@ -67,7 +67,7 @@ cp .env.example .env
 php artisan key:generate
 
 # Set necessary permissions
-sudo chgrp -R www-data storage bootstrap/cache
+oobcsudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
 ```
 The script navigates into the project directory, installs project dependencies through Composer, sets up the environment file for Laravel, and sets necessary permissions
@@ -100,6 +100,7 @@ FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 ```
 This part of the script creates a MySQL database and user for the Laravel application
+
 ```bash
 # Update .env file with database configuration
 sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
