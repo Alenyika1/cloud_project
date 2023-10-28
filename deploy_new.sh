@@ -4,17 +4,17 @@
 echo "Updating System..."
 sudo apt-get update -y
 
+# Add PHP repository for PHP 8.2
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt-get update -y
+
 # Install Apache2
 echo "Installing Apache2..."
 sudo apt-get install -y apache2
 
-# Install MySQL Server
-echo "Installing MySQL Server..."
-sudo apt-get install -y mysql-server
-
-# Install PHP and necessary PHP extensions
-echo "Installing PHP and necessary PHP extensions..."
-sudo apt-get install -y php php-common php-cli php-gd php-curl php-mysql
+# Install PHP 8.2 and necessary PHP extensions
+echo "Installing PHP 8.2 and necessary PHP extensions..."
+sudo apt-get install -y php8.2 php8.2-common php8.2-cli php8.2-gd php8.2-curl php8.2-mysql
 
 # Install Composer
 echo "Installing Composer..."
@@ -29,14 +29,12 @@ sudo git clone https://github.com/laravel/laravel.git /var/www/html/
 sudo chown -R vagrant:vagrant /var/www/html/laravel/
 cd /var/www/html/laravel
 
-
 # Configure environment file for Laravel
 sudo cp .env.example .env
 
 # Install dependencies through Composer
 echo "Installing project dependencies..."
 composer install
-
 php artisan key:generate
 
 # Set necessary permissions
@@ -57,7 +55,8 @@ sudo a2enmod rewrite
 # Restart Apache
 sudo systemctl restart apache2
 
-# Create MySQL Database and User for the Laravel application (Replace 'database_name', 'user' and 'password' with your actual database name, username and password)
+# Create MySQL Database and User for the Laravel application
+# (Replace 'database_name', 'user', and 'password' with your actual database name, username, and password)
 mysql -uroot -proot <<MYSQL_SCRIPT
 CREATE DATABASE laravel;
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'alenyika';
@@ -70,9 +69,8 @@ sudo sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
 sudo sed -i "s/DB_USERNAME=.*/DB_USERNAME=admin/" .env
 sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=alenyika/" .env
 
-# Start local server deployement
-php artisan migrate # this start the database migration as configured in the .env file and mysql settings
+# Start local server deployment
+php artisan migrate # This starts the database migration as configured in the .env file and MySQL settings
 php artisan serve
 
-
-echo "LAMP Stack Installed and Configured!"
+echo "LAMP Stack Installed and Configured with PHP 8.2!"
