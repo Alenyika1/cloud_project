@@ -146,7 +146,10 @@ echo "LAMP Stack Installed and Configured!"
 ```
 
 4. **Execute the Ansible Playbook**
-    Create 
+- Install anisble on the master server 
+```bash
+sudo apt-get install ansible
+```
    To execute the Ansible playbook, make sure that the ssh connectiion between the nodes are enabled. To do this, copy your ssh key from your master node to the slave node autorized_keys file. 
    Navigate to the directory containing your playbook file in your terminal and run:
 
