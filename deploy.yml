@@ -2,30 +2,29 @@
 - hosts: slave
   become: yes
   tasks:
-    - name: Execute the bash script
-      script: /home/vagrant/deploy_new.sh
+    - name: Copy the LAMP setup script to the remote server
+      copy:
+        src: /home/vagrant/deploy_new.sh
+        dest: /tmp/lamp_setup.sh
+        mode: '0755'
 
-    - name: Verify PHP installation
-      command: php -v
-      register: php_version
+    - name: Execute the LAMP setup script
+      command: /tmp/lamp_setup.sh
+      register: setup_output
 
-    - name: Debug PHP Version
-      debug:
-        var: php_version.stdout
+    - name: Ensure the Apache service is running
+      service:
+        name: apache2
+        state: started
 
-    - name: Verify PHP Application Accessibility
-      command: curl -I http://192.168.58.4
-      register: php_app_access
-      ignore_errors: yes
-
-    - name: Debug PHP Application Access Result
-      debug:
-        var: php_app_access.stdout_lines
-
-    - name: Set Up a Cron Job to Check Server Uptime
+    - name: Ensure the MySQL service is running
+      service:
+        name: mysql
+        state: started
+        
+    - name: Create a cron job to check server uptime
       cron:
-        name: Check Server Uptime
-        minute: 0
-        hour: 0
-        job: "uptime > /var/log/uptime.log"
-
+        name: "uptime_check"
+        minute: "0"
+        hour: "0"
+        job: "uptime >> /var/log/uptime.log"
