@@ -43,11 +43,18 @@ sudo chmod -R ug+rwx storage bootstrap/cache
 
 # Configure Apache to run the Laravel application
 sudo sh -c 'echo "<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html/laravel/public
+
     <Directory /var/www/html/laravel/>
-        AllowOverride All
+      Options +FollowSymlinks
+       AllowOverride All
+       Require all granted
     </Directory>
-</VirtualHost>" > /etc/apache2/sites-available/laravel.conf'
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost> /etc/apache2/sites-available/laravel.conf'
 
 # Enable Apache mod_rewrite
 sudo a2enmod rewrite
@@ -57,7 +64,8 @@ sudo systemctl restart apache2
 
 # Create MySQL Database and User for the Laravel application
 # (Replace 'database_name', 'user', and 'password' with your actual database name, username, and password)
-mysql -uroot -proot <<MYSQL_SCRIPT
+mysq
+ -proot <<MYSQL_SCRIPT
 CREATE DATABASE laravel;
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'alenyika';
 GRANT ALL PRIVILEGES ON laravel.* TO 'admin'@'localhost';
