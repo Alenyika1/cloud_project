@@ -5,13 +5,38 @@ This guide provides step-by-step instructions on how to automate the deployment 
 ## Prerequisites
 
 - Ubuntu-based servers named "Master" and "Slave"
+- Vagrant Insatlled on the loacl machine
 - Ansible installed on your local machine
 - Git installed on your local machine
 - A Laravel application hosted on GitHub
 
 ## Steps
+1. **Create a vahrant configuration file to provision the Master and Slave node and the appropiate configuration needed for the cluster**
 
-1. **Create a Bash Script for LAMP Stack Deployment**
+ ```bash
+ Vagrant.configure("2") do |config|
+  # Configure the "Master" VM
+  config.vm.define "master" do |master|
+    master.vm.box = "ubuntu/focal64"  # Define the base box for the "Master" VM
+    master.vm.hostname = "master"  # Set the hostname for the "Master" VM
+    master.vm.network "private_network", ip: "192.168.58.2"  # Assign a private network IP to the "Master" VM
+  end
+
+  # Configure the "Slave" VM
+  config.vm.define "slave" do |slave|
+    slave.vm.box = "ubuntu/focal64"  # Define the base box for the "Slave" VM
+    slave.vm.hostname = "slave"  # Set the hostname for the "Slave" VM
+    slave.vm.network "private_network", ip: "192.168.58.4"  # Assign a private network IP to the "Slave" VM
+  end
+
+  # Customize provider settings (VirtualBox in this example)
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"  # Adjust the value to allocate more memory to each VM
+  end
+end
+ ```
+
+2. **Create a Bash Script for LAMP Stack Deployment**
 
     Create a bash script named `deploy.sh` in the home directory of your Master server. This script will install and configure the LAMP (Linux, Apache, MySQL, PHP) stack, clone your Laravel application from GitHub, and set up a MySQL database for the application.
 
@@ -90,7 +115,6 @@ sudo systemctl restart apache2
 The above part of the deploy.sh script is to configures Apache to serve the Laravel application, enables mod_rewrite for URL rewriting support, and restarts Apache to apply changes
 
 ```bash
-
 # Create MySQL Database and User for the Laravel app lication (Replace 'database_name', 'user' and 'password' with your actual database name, username and password)
 mysql -uroot -proot <<MYSQL_SCRIPT
 CREATE DATABASE laravel;
@@ -100,7 +124,6 @@ FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 ```
 This part of the script creates a MySQL database and user for the Laravel application
-
 ```bash
 # Update .env file with database configuration
 sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
@@ -117,7 +140,8 @@ echo "LAMP Stack Installed and Configured!"
 ```
 The last step is to migrate the database configured in the .env file and start a local development server. 
 
-3. **Execute the Ansible Playbook**
+4. **Execute the Ansible Playbook**
+    Create 
 
    To execute the Ansible playbook, make sure that the ssh connectiion between the nodes are enabled. To do this, copy your ssh key from your master node to the slave node autorized_keys file. Navigate to the directory containing your playbook file in your terminal and run:
 

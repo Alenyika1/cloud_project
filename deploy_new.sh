@@ -56,12 +56,6 @@ sudo sh -c 'echo "<VirtualHost *:80>
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost> /etc/apache2/sites-available/laravel.conf'
 
-# Enable Apache mod_rewrite
-sudo a2enmod rewrite
-
-# Restart Apache
-sudo systemctl restart apache2
-
 # Create MySQL Database and User for the Laravel application
 # (Replace 'database_name', 'user', and 'password' with your actual database name, username, and password)
 mysq
@@ -77,8 +71,22 @@ sudo sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel/" .env
 sudo sed -i "s/DB_USERNAME=.*/DB_USERNAME=admin/" .env
 sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=alenyika/" .env
 
+# This starts the database migration as configured in the .env file and MySQL settings
+php artisan migrate 
+
+# Disable the default configuration file
+sudo a2dissite 000-default.conf
+
+# enable the laravel configuration in Apache
+sudo a2ensite laravel.conf
+
+# Enable Apache mod_rewrite
+sudo a2enmod rewrite
+
+# Restart Apache
+sudo systemctl restart apache2
+
 # Start local server deployment
-php artisan migrate # This starts the database migration as configured in the .env file and MySQL settings
 php artisan serve
 
 echo "LAMP Stack Installed and Configured with PHP 8.2!"
