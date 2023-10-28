@@ -4,7 +4,7 @@
   tasks:
     - name: Copy the LAMP setup script to the remote server
       copy:
-        src: /home/vagrant/deploy_new.sh
+        src: /home/vagrant/cloud_project/deploy_new.sh
         dest: /tmp/lamp_setup.sh
         mode: '0755'
 
@@ -21,7 +21,7 @@
       service:
         name: mysql
         state: started
-        
+
     - name: Create a cron job to check server uptime
       cron:
         name: "uptime_check"
