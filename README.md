@@ -154,8 +154,8 @@ sudo apt-get install ansible
 ```bash
 nano inventory
 
-[webserver]
-192.168.58.4 ansible_ssh
+[webservers]
+192.168.58.4 ansible_ssh_user=vagrant
 ```
 - A playbook to execute the task should be created.
 the first part of the playbook is to copy the script to the slave node and set the permission so as to execute the task.
