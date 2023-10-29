@@ -14,7 +14,7 @@ sudo apt-get install -y apache2
 
 # Install PHP 8.2 and necessary PHP extensions
 echo "Installing PHP 8.2 and necessary PHP extensions..."
-sudo apt-get install -y php8.2 php8.2-common php8.2-cli php8.2-gd php8.2-curl php8.2-mysql
+sudo apt-get install -y php8.2 php8.2-common php8.2-cli php8.2-gd php8.2-curl php8.2-mysql php-xml
 
 # Install Composer
 echo "Installing Composer..."
