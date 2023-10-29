@@ -166,11 +166,11 @@ the first part of the playbook is to copy the script to the slave node and set t
     - name: Copy the LAMP setup script to the remote server
       copy:
         src: /home/vagrant/cloud_project/deploy_new.sh
-        dest: /home/vagrant/lamp_setup.sh
+        dest: /home/vagrant/deploy_new.sh
         mode: '0755'
 
     - name: Execute the LAMP setup script
-      command: /home/vagrant/lamp_setup.sh
+      command: /home/vagrant/deploy_new.sh
       register: setup_output'
   ``` 
 - Check to ensure that all services installed are running properly
