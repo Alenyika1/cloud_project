@@ -150,11 +150,55 @@ echo "LAMP Stack Installed and Configured!"
 ```bash
 sudo apt-get install ansible
 ```
-   To execute the Ansible playbook, make sure that the ssh connectiion between the nodes are enabled. To do this, copy your ssh key from your master node to the slave node autorized_keys file. 
-   Navigate to the directory containing your playbook file in your terminal and run:
+- create an inventory file for the slave server that will be configure by the server and the slave vm ip address
+```bash
+nano inventory
 
-   ```bash
-   ansible-playbook -i inventory deploy.yml
-   ```
+[webserver]
+192.168.58.4 ansible_ssh
+```
+- A playbook to execute the task should be created.
+the first part of the playbook is to copy the script to the slave node and set the permission so as to execute the task.
+```bash
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Copy the LAMP setup script to the remote server
+      copy:
+        src: /home/vagrant/cloud_project/deploy_new.sh
+        dest: /home/vagrant/lamp_setup.sh
+        mode: '0755'
+
+    - name: Execute the LAMP setup script
+      command: /home/vagrant/lamp_setup.sh
+      register: setup_output'
+  ``` 
+- Check to ensure that all services installed are running properly
+```bash
+    - name: Ensure the Apache service is running
+      service:
+        name: apache2
+        state: started
+
+    - name: Ensure the MySQL service is running
+      service:
+        name: mysql
+        state: started
+  ``` 
+ - The last part is to create a cron job that check for server uptime and register the log into a file on the slave server.
+```bash
+  - name: Create a cron job to check server uptime
+      cron:
+        name: "uptime_check"
+        minute: "0"
+        hour: "0"
+        job: "uptime >> /var/log/uptime.log"
+```
+- To execute the Ansible playbook, make sure that the ssh connectiion between the nodes are enabled. To do this, copy your ssh key from your master node to the slave node autorized_keys file. 
+Navigate to the directory containing your playbook file in your terminal and run:
+
+ ```bash
+ ansible-playbook -i inventory deploy.yml
+ ```
 
 That's it! Your Laravel application should now be deployed on your Slave server with a LAMP stack.

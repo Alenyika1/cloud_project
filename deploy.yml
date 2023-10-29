@@ -5,11 +5,11 @@
     - name: Copy the LAMP setup script to the remote server
       copy:
         src: /home/vagrant/cloud_project/deploy_new.sh
-        dest: /tmp/lamp_setup.sh
+        dest: /home/vagrant/lamp_setup.sh
         mode: '0755'
 
     - name: Execute the LAMP setup script
-      command: /tmp/lamp_setup.sh
+      command: /home/vagrant/lamp_setup.sh
       register: setup_output
 
     - name: Ensure the Apache service is running
