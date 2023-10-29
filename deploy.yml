@@ -8,9 +8,15 @@
         dest: /home/vagrant/deploy_new.sh
         mode: '0755'
 
+<<<<<<< HEAD
    # - name: Execute the LAMP setup script
     #  command: /home/vagrant/deploy_new.sh
      # register: setup_output
+=======
+    - name: Execute the LAMP setup script
+      command: /home/vagrant/deploy_new.sh
+      register: setup_output
+>>>>>>> 78709c15d5ad0f69229adf88ba671e8596e7a6c4
 
     - name: Ensure the Apache service is running
       service:

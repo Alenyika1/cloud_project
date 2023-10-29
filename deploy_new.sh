@@ -12,9 +12,34 @@ sudo apt-get update -y
 echo "Installing Apache2..."
 sudo apt-get install -y apache2
 
+# Install Zip and Unzip Tools
+sudo apt-get install -y zip unzip
+
 # Install PHP 8.2 and necessary PHP extensions
 echo "Installing PHP 8.2 and necessary PHP extensions..."
+<<<<<<< HEAD
 sudo apt-get install -y php8.2 php8.2-common php8.2-cli php8.2-gd php8.2-curl php8.2-mysql php-xml
+=======
+sudo apt-get install -y php8.2 php8.2-common php8.2-cli php8.2-gd php8.2-curl php8.2-mysql php8.2-zip php-xml
+
+# Install MySQL Server
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password alenyika'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password alenyika'
+sudo apt-get install -y mysql-server
+
+# Secure the MySQL installation
+sudo mysql_secure_installation <<EOF
+
+y
+alenyika
+alenyika
+y
+y
+y
+y
+EOF
+
+>>>>>>> 78709c15d5ad0f69229adf88ba671e8596e7a6c4
 
 # Install Composer
 echo "Installing Composer..."
@@ -23,7 +48,7 @@ sudo mv composer.phar /usr/local/bin/composer
 
 # Clone Laravel application from GitHub
 echo "Cloning Laravel application from Git..."
-sudo git clone https://github.com/laravel/laravel.git /var/www/html/
+sudo git clone https://github.com/laravel/laravel.git /var/www/html/laravel
 
 # Navigate to the project directory
 sudo chown -R vagrant:vagrant /var/www/html/laravel/
@@ -35,31 +60,31 @@ sudo cp .env.example .env
 # Install dependencies through Composer
 echo "Installing project dependencies..."
 composer install
-php artisan key:generate
+sudo php artisan key:generate
 
 # Set necessary permissions
 sudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
 
-# Configure Apache to run the Laravel application
-sudo sh -c 'echo "<VirtualHost *:80>
+# Configure Apache to run the laravel Application
+echo "<VirtualHost *:80>
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html/laravel/public
 
     <Directory /var/www/html/laravel/>
       Options +FollowSymlinks
-       AllowOverride All
-       Require all granted
+      AllowOverride All
+      Require all granted
     </Directory>
 
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost> /etc/apache2/sites-available/laravel.conf'
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>" | sudo tee /etc/apache2/sites-available/laravel.conf
+
 
 # Create MySQL Database and User for the Laravel application
 # (Replace 'database_name', 'user', and 'password' with your actual database name, username, and password)
-mysq
- -proot <<MYSQL_SCRIPT
+mysql -proot <<MYSQL_SCRIPT
 CREATE DATABASE laravel;
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'alenyika';
 GRANT ALL PRIVILEGES ON laravel.* TO 'admin'@'localhost';
